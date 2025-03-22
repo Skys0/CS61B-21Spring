@@ -1,197 +1,185 @@
 package deque;
 
+import java.util.Deque;
 import java.util.Iterator;
 
-public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
+public class LinkedListDeque<Generics> implements Iterable<Generics> {
+    private ArbitNode sentinel;
+    private int size;
 
-    private static class Node<T> {
-        private final T item;
-        private Node<T> prev;
-        private Node<T> next;
-        Node(T item) {
-            this.item = item;
-            this.prev = null;
-            this.next = null;
+    public class ArbitNode {
+        public ArbitNode prev;
+        public Generics item;
+        public ArbitNode next;
+
+        public ArbitNode(Generics i, ArbitNode n) {
+            item = i;
+            next = n;
         }
     }
 
-    private int size;
-    private final Node<T> sentinel;
 
-    /** Creates an empty linked list deque. */
+    // Create a List with empty.
     public LinkedListDeque() {
-        sentinel = new Node<>(null);
-        sentinel.prev = sentinel;
+        sentinel = new ArbitNode(null, null);
         sentinel.next = sentinel;
+        sentinel.prev = sentinel;
+
         size = 0;
     }
 
-    /** Adds an item of type T to the front of the deque. */
-    @Override
-    public void addFirst(T item) {
-        Node<T> newNode = new Node<>(item);
-        newNode.prev = sentinel;
-        newNode.next = sentinel.next;
-        sentinel.next.prev = newNode;
-        sentinel.next = newNode;
+    // Create a List with Copy other.
+    public LinkedListDeque(LinkedListDeque<Generics> other) {
+        sentinel = new ArbitNode(null,null);
+        sentinel.next = sentinel;
+        sentinel.prev = sentinel;
+        size = 0;
+
+        for(int i = 0;i < other.size();i ++) {
+            Generics t = other.get(i);
+            this.addLast(t);
+        }
+    }
+
+    // Add an item to the front of the deque.
+    public void addFirst(Generics item)  {
+        ArbitNode p = sentinel;
+        ArbitNode temp = new ArbitNode(item, null);
+
+        p.next.prev = temp;
+        temp.next = p.next;
+        p.next = temp;
+        temp.prev = p;
         size += 1;
     }
 
-    /** Adds an item of type T to the back of the deque. */
-    @Override
-    public void addLast(T item) {
-        Node<T> newNode = new Node<>(item);
-        newNode.prev = sentinel.prev;
-        newNode.next = sentinel;
-        sentinel.prev.next = newNode;
-        sentinel.prev = newNode;
+    // Add an item to the bottom of the deque.
+    public void addLast(Generics item) {
+        ArbitNode p = sentinel;
+        ArbitNode temp = new ArbitNode(item, null);
+
+        p.prev.next = temp;
+        temp.prev = p.prev;
+        p.prev = temp;
+        temp.next = p;
         size += 1;
     }
 
-    /** Returns the number of items in the deque. */
-    @Override
+    // Check the List is Empty.
+    public boolean isEmpty() {
+        ArbitNode p = sentinel;
+        return p.next == p && p.prev == p;
+    }
+
+    // Get the size of List
     public int size() {
         return size;
     }
 
-    /** Prints the items in the deque from first to last. */
-    @Override
+    // Get the `index` position of the List.
+    public Generics get(int index) {
+        ArbitNode p = sentinel;
+        for (int i = 0;i <= index;i ++)
+            p = p.next;
+
+        return p.item;
+    }
+
+    // Print all of a List.
     public void printDeque() {
-        // Print nothing if the deque is empty.
-        if (isEmpty()) {
-            return;
+        ArbitNode p = sentinel.next;
+        while (p != sentinel) {
+            System.out.print(p.item);
+            System.out.print(" ");
+            p = p.next;
         }
-        // Use temp to traverse the deque.
-        StringBuilder printStr = new StringBuilder();
-        Node<T> temp = sentinel.next;
-        printStr.append(temp.item);
-        while (temp.next != sentinel) {
-            temp = temp.next;
-            printStr.append(" ");
-            printStr.append(temp.item);
-        }
-        System.out.println(printStr);
+        System.out.print("\n");
     }
 
-    /** Removes and returns the item at the front of the deque. */
-    @Override
-    public T removeFirst() {
-        // If no such item exists, return null.
-        if (isEmpty()) {
-            return null;
-        }
-        // Use item to hold the return node.
-        T returnItem = sentinel.next.item;
-        sentinel.next = sentinel.next.next;
-        sentinel.next.prev = sentinel;
+    // Remove the list of the first.
+    public Generics removeFirst() {
+        ArbitNode p = sentinel.next;
+        if (p == sentinel)      return null;
+
+        Generics temp = p.item;
+        p.prev.next = p.next;
+        p.next.prev = p.prev;
         size -= 1;
-        return returnItem;
+        return temp;
     }
 
-    /** Removes and returns the item at the back of the deque. */
-    @Override
-    public T removeLast() {
-        // If no such item exists, return null.
-        if (isEmpty()) {
-            return null;
-        }
-        // Use item to hold the return node.
-        T returnItem = sentinel.prev.item;
-        sentinel.prev = sentinel.prev.prev;
-        sentinel.prev.next = sentinel;
+    // Remove the list of the Last.
+    public Generics removeLast() {
+        ArbitNode p = sentinel.prev;
+        if(p == sentinel)   return null;
+
+        Generics temp = p.item;
+
+        p.prev.next = p.next;
+        p.next.prev = p.prev;
         size -= 1;
-        return returnItem;
+        return temp;
     }
 
-    /** Gets the item at the given index, using iteration. */
-    @Override
-    public T get(int index) {
-        // If no such item exists, return null.
-        if (index < 0 || index > size - 1) {
-            return null;
-        }
-        // Iterate to the desired node at the given index.
-        Node<T> temp = sentinel.next;
-        for (int i = 0; i < index; i++) {
-            temp = temp.next;
-        }
-        return temp.item;
+    // Use recursion to get member.
+    public Generics getRecursive(int index) {
+        return get1(sentinel.next, index);
     }
 
-    /** Gets the item at the given index, using recursion. */
-    public T getRecursive(int index) {
-        // If no such item exists, return null.
-        if (index < 0 || index > size - 1) {
-            return null;
-        }
-        // Call helper to do the recursion.
-        return nodeRecursion(index, sentinel.next);
-    }
-
-    /** Helper method for getRecursive, takes an extra Node parameter to perform recursion. */
-    private T nodeRecursion(int index, Node<T> node) {
+    private Generics get1(ArbitNode node, int index) {
         if (index == 0) {
-            // Base case.
             return node.item;
-        } else {
-            // Where recursion really happens.
-            return nodeRecursion(index - 1, node.next);
         }
+        return get1(node.next, index - 1);
     }
 
-    /** Returns a LinkedListDeque iterator. */
     @Override
-    public Iterator<T> iterator() {
-        return new LLDequeItr();
+    public Iterator<Generics> iterator(){
+        return new LLDIterator();
     }
 
-    private class LLDequeItr implements Iterator<T> {
-        private Node<T> cursor;
-
-        LLDequeItr() {
-            cursor = sentinel.next;
+    private class LLDIterator implements Iterator<Generics>{
+        private int currentIndex = 0;
+        @Override
+        public boolean hasNext(){
+            return  currentIndex<size && get(currentIndex) !=null;
         }
 
         @Override
-        public boolean hasNext() {
-            return cursor != sentinel;
+        public Generics next(){
+            Generics temp = get(currentIndex);
+            currentIndex = currentIndex + 1;
+            return temp;
         }
 
-        @Override
-        public T next() {
-            T returnItem = cursor.item;
-            cursor = cursor.next;
-            return returnItem;
-        }
     }
 
-    /** Returns whether or not the parameter o is equal to the deque. */
     @Override
-    public boolean equals(Object o) {
-        // True if the same reference.
-        if (o == this) {
-            return true;
-        }
-        // False if o is null.
-        if (o == null) {
-            return false;
-        }
-        // Check for type casting.
-        if (!(o instanceof Deque)) {
-            return false;
-        }
-        Deque<T> that = (Deque<T>) o;
-        // False if size is different.
-        if (this.size() != that.size()) {
-            return false;
-        }
-        // Traverse both deque and check the item of each node.
-        for (int i = 0; i < this.size; i++) {
-            if (!this.get(i).equals(that.get(i))) {
-                return false;
-            }
-        }
-        return true;
-    }
+//    public boolean equals(Object o) {
+//        if (o == null) {
+//            return false;
+//        }
+//        if (this == o) {
+//            return true;
+//        }
+//
+//        if (!(o instanceof Deque)) {
+//            return  false;
+//        }
+//        Deque<Generics> other = (Deque<Generics>) o;
+//        if (this.size() != other.size()) {
+//            return false;
+//        }
+//
+//        for (int i = 0; i < size(); i++) {
+//            if (!other.get(i).equals(this.get(i))) {//这里记得考虑嵌套数组的情况不能使用==来判定相等
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
+    public static void main(String[] args) {
+        LinkedListDeque<Integer> a = new LinkedListDeque<>();
+    }
 }
