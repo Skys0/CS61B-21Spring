@@ -156,11 +156,11 @@ public class LinkedListDeque<Generics> implements Deque<Generics>,Iterable<Gener
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof LinkedListDeque)) {
+        if (!(o instanceof Deque)) {
             return false;
         }
-        LinkedListDeque<Generics> t = (LinkedListDeque<Generics>) o;
-        if (t.size != size) {
+        Deque<Generics> t = (Deque<Generics>) o;
+        if (t.size() != size) {
             return false;
         }
 
