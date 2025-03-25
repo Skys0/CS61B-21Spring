@@ -1,9 +1,8 @@
 package deque;
 
-import java.util.Deque;
 import java.util.Iterator;
 
-public class LinkedListDeque<Generics> implements Iterable<Generics> {
+public class LinkedListDeque<Generics> implements Deque<Generics>,Iterable<Generics> {
     private ArbitNode sentinel;
     private int size;
 
@@ -133,53 +132,54 @@ public class LinkedListDeque<Generics> implements Iterable<Generics> {
         return get1(node.next, index - 1);
     }
 
-    @Override
-    public Iterator<Generics> iterator(){
-        return new LLDIterator();
+    public Iterator<Generics> iterator() {
+        return new LinkedListIterator();
     }
 
-    private class LLDIterator implements Iterator<Generics>{
-        private int currentIndex = 0;
-        @Override
-        public boolean hasNext(){
-            return  currentIndex<size && get(currentIndex) !=null;
+    private class LinkedListIterator implements Iterator<Generics> {
+        private int wizPos;
+
+        public LinkedListIterator() {
+            wizPos = 0;
         }
 
-        @Override
-        public Generics next(){
-            Generics temp = get(currentIndex);
-            currentIndex = currentIndex + 1;
-            return temp;
+        public boolean hasNext() {
+            return wizPos < size;
         }
 
+        public Generics next() {
+            Generics returnItem = get(wizPos);
+            wizPos += 1;
+            return returnItem;
+        }
     }
 
     @Override
-//    public boolean equals(Object o) {
-//        if (o == null) {
-//            return false;
-//        }
-//        if (this == o) {
-//            return true;
-//        }
-//
-//        if (!(o instanceof Deque)) {
-//            return  false;
-//        }
-//        Deque<Generics> other = (Deque<Generics>) o;
-//        if (this.size() != other.size()) {
-//            return false;
-//        }
-//
-//        for (int i = 0; i < size(); i++) {
-//            if (!other.get(i).equals(this.get(i))) {//这里记得考虑嵌套数组的情况不能使用==来判定相等
-//                return false;
-//            }
-//        }
-//        return true;
-//    }
+    public boolean equals(Object o) {
+        if (!(o instanceof LinkedListDeque)) {
+            return false;
+        }
+        LinkedListDeque<Generics> t = (LinkedListDeque<Generics>) o;
+        if (t.size != size) {
+            return false;
+        }
+
+        for(int i = 0;i < size;i ++) {
+            if(! (t.get(i).equals(this.get(i)))){
+                return false;
+            }
+        }
+        return true;
+    }
+
 
     public static void main(String[] args) {
         LinkedListDeque<Integer> a = new LinkedListDeque<>();
+        a.addFirst(1);
+        a.addFirst(2);
+        a.addFirst(3);
+        for (int i : a) {
+            System.out.print(i);
+        }
     }
 }
