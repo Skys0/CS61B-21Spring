@@ -2,16 +2,16 @@ package deque;
 
 import java.util.Iterator;
 
-public class LinkedListDeque<T> implements Deque<T>,Iterable<T> {
+public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     private ArbitNode sentinel;
     private int size;
 
     private class ArbitNode {
-        public ArbitNode prev;
-        public T item;
-        public ArbitNode next;
+        private ArbitNode prev;
+        private T item;
+        private ArbitNode next;
 
-        public ArbitNode(T i, ArbitNode n) {
+        private ArbitNode(T i, ArbitNode n) {
             item = i;
             next = n;
         }
@@ -29,12 +29,12 @@ public class LinkedListDeque<T> implements Deque<T>,Iterable<T> {
 
     // Create a List with Copy other.
     public LinkedListDeque(LinkedListDeque<T> other) {
-        sentinel = new ArbitNode(null,null);
+        sentinel = new ArbitNode(null, null);
         sentinel.next = sentinel;
         sentinel.prev = sentinel;
         size = 0;
 
-        for(int i = 0;i < other.size();i ++) {
+        for (int i = 0; i < other.size(); i++) {
             T t = other.get(i);
             this.addLast(t);
         }
@@ -72,8 +72,9 @@ public class LinkedListDeque<T> implements Deque<T>,Iterable<T> {
     // Get the `index` position of the List.
     public T get(int index) {
         ArbitNode p = sentinel;
-        for (int i = 0;i <= index;i ++)
+        for (int i = 0; i <= index; i++) {
             p = p.next;
+        }
 
         return p.item;
     }
@@ -92,7 +93,9 @@ public class LinkedListDeque<T> implements Deque<T>,Iterable<T> {
     // Remove the list of the first.
     public T removeFirst() {
         ArbitNode p = sentinel.next;
-        if (p == sentinel)      return null;
+        if (p == sentinel) {
+            return null;
+        }
 
         T temp = p.item;
         p.prev.next = p.next;
@@ -104,7 +107,9 @@ public class LinkedListDeque<T> implements Deque<T>,Iterable<T> {
     // Remove the list of the Last.
     public T removeLast() {
         ArbitNode p = sentinel.prev;
-        if(p == sentinel)   return null;
+        if (p == sentinel) {
+            return null;
+        }
 
         T temp = p.item;
 
@@ -158,8 +163,8 @@ public class LinkedListDeque<T> implements Deque<T>,Iterable<T> {
             return false;
         }
 
-        for(int i = 0;i < size;i ++) {
-            if(! (t.get(i).equals(this.get(i)))){
+        for (int i = 0; i < size; i++) {
+            if (!(t.get(i).equals(this.get(i)))) {
                 return false;
             }
         }
