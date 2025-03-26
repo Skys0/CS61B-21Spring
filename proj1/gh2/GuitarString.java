@@ -3,6 +3,7 @@ package gh2;
 // TODO: uncomment the following import once you're ready to start this portion
  import deque.ArrayDeque;
  import deque.Deque;
+ import deque.LinkedListDeque;
 // TODO: maybe more imports
 
 //Note: This file will not compile until you complete the Deque implementations
@@ -15,10 +16,11 @@ public class GuitarString {
 
     /* Buffer for storing sound data. */
     // TODO: uncomment the following line once you're ready to start this portion
-     private Deque<Double> buffer = new ArrayDeque<>();
+     private Deque<Double> buffer;
 
     /* Create a guitar string of the given frequency.  */
     public GuitarString(double frequency) {
+        buffer = new LinkedListDeque<>();
         int capacity = (int) Math.round(SR / frequency);
         for(int i = 0;i < capacity;i ++) {
             buffer.addLast(0.0);
@@ -30,7 +32,7 @@ public class GuitarString {
     public void pluck() {
         for(int i = 0;i < buffer.size();i ++) {
             double r = Math.random() - 0.5;
-            buffer.removeLast();
+            buffer.removeFirst();
             buffer.addLast(r);
         }
     }

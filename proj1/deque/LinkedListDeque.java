@@ -2,16 +2,16 @@ package deque;
 
 import java.util.Iterator;
 
-public class LinkedListDeque<Generics> implements Deque<Generics>,Iterable<Generics> {
+public class LinkedListDeque<T> implements Deque<T>,Iterable<T> {
     private ArbitNode sentinel;
     private int size;
 
-    public class ArbitNode {
+    private class ArbitNode {
         public ArbitNode prev;
-        public Generics item;
+        public T item;
         public ArbitNode next;
 
-        public ArbitNode(Generics i, ArbitNode n) {
+        public ArbitNode(T i, ArbitNode n) {
             item = i;
             next = n;
         }
@@ -28,20 +28,20 @@ public class LinkedListDeque<Generics> implements Deque<Generics>,Iterable<Gener
     }
 
     // Create a List with Copy other.
-    public LinkedListDeque(LinkedListDeque<Generics> other) {
+    public LinkedListDeque(LinkedListDeque<T> other) {
         sentinel = new ArbitNode(null,null);
         sentinel.next = sentinel;
         sentinel.prev = sentinel;
         size = 0;
 
         for(int i = 0;i < other.size();i ++) {
-            Generics t = other.get(i);
+            T t = other.get(i);
             this.addLast(t);
         }
     }
 
     // Add an item to the front of the deque.
-    public void addFirst(Generics item)  {
+    public void addFirst(T item)  {
         ArbitNode p = sentinel;
         ArbitNode temp = new ArbitNode(item, null);
 
@@ -53,7 +53,7 @@ public class LinkedListDeque<Generics> implements Deque<Generics>,Iterable<Gener
     }
 
     // Add an item to the bottom of the deque.
-    public void addLast(Generics item) {
+    public void addLast(T item) {
         ArbitNode p = sentinel;
         ArbitNode temp = new ArbitNode(item, null);
 
@@ -64,19 +64,13 @@ public class LinkedListDeque<Generics> implements Deque<Generics>,Iterable<Gener
         size += 1;
     }
 
-    // Check the List is Empty.
-    public boolean isEmpty() {
-        ArbitNode p = sentinel;
-        return p.next == p && p.prev == p;
-    }
-
     // Get the size of List
     public int size() {
         return size;
     }
 
     // Get the `index` position of the List.
-    public Generics get(int index) {
+    public T get(int index) {
         ArbitNode p = sentinel;
         for (int i = 0;i <= index;i ++)
             p = p.next;
@@ -96,11 +90,11 @@ public class LinkedListDeque<Generics> implements Deque<Generics>,Iterable<Gener
     }
 
     // Remove the list of the first.
-    public Generics removeFirst() {
+    public T removeFirst() {
         ArbitNode p = sentinel.next;
         if (p == sentinel)      return null;
 
-        Generics temp = p.item;
+        T temp = p.item;
         p.prev.next = p.next;
         p.next.prev = p.prev;
         size -= 1;
@@ -108,11 +102,11 @@ public class LinkedListDeque<Generics> implements Deque<Generics>,Iterable<Gener
     }
 
     // Remove the list of the Last.
-    public Generics removeLast() {
+    public T removeLast() {
         ArbitNode p = sentinel.prev;
         if(p == sentinel)   return null;
 
-        Generics temp = p.item;
+        T temp = p.item;
 
         p.prev.next = p.next;
         p.next.prev = p.prev;
@@ -121,22 +115,22 @@ public class LinkedListDeque<Generics> implements Deque<Generics>,Iterable<Gener
     }
 
     // Use recursion to get member.
-    public Generics getRecursive(int index) {
+    public T getRecursive(int index) {
         return get1(sentinel.next, index);
     }
 
-    private Generics get1(ArbitNode node, int index) {
+    private T get1(ArbitNode node, int index) {
         if (index == 0) {
             return node.item;
         }
         return get1(node.next, index - 1);
     }
 
-    public Iterator<Generics> iterator() {
+    public Iterator<T> iterator() {
         return new LinkedListIterator();
     }
 
-    private class LinkedListIterator implements Iterator<Generics> {
+    private class LinkedListIterator implements Iterator<T> {
         private int wizPos;
 
         public LinkedListIterator() {
@@ -147,8 +141,8 @@ public class LinkedListDeque<Generics> implements Deque<Generics>,Iterable<Gener
             return wizPos < size;
         }
 
-        public Generics next() {
-            Generics returnItem = get(wizPos);
+        public T next() {
+            T returnItem = get(wizPos);
             wizPos += 1;
             return returnItem;
         }
@@ -159,7 +153,7 @@ public class LinkedListDeque<Generics> implements Deque<Generics>,Iterable<Gener
         if (!(o instanceof Deque)) {
             return false;
         }
-        Deque<Generics> t = (Deque<Generics>) o;
+        Deque<T> t = (Deque<T>) o;
         if (t.size() != size) {
             return false;
         }
