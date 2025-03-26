@@ -47,7 +47,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             resize(size * 2);
         }
 
-        last = (last + 1) % items.length;
+        if (!isEmpty()) {
+            last = (last + 1) % items.length;
+        }
         items[last] = item;
         size += 1;
     }
@@ -147,16 +149,17 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
         return true;
     }
 
-    public static void main(String[] args) {
-        ArrayDeque<Integer> a = new ArrayDeque<>();
-        a.addLast(0);
-        a.addLast(1);
-        a.addLast(2);
-        a.addLast(3);
-        System.out.println(a.isEmpty());
-        System.out.println(a.isEmpty());
-        a.addLast(6);
-        System.out.println(a.isEmpty());
-        System.out.println(a.removeLast());
-    }
+//    public static void main(String[] args) {
+//        ArrayDeque<Integer> a = new ArrayDeque<>();
+//        a.addLast(0);
+//        a.addLast(1);
+//        a.addLast(2);
+//        a.addLast(3);
+//        a.addLast(4);
+//        System.out.println(a.isEmpty());
+//        System.out.println(a.isEmpty());
+//        a.addLast(7);
+//        System.out.println(a.isEmpty());
+//        System.out.println(a.removeFirst());
+//    }
 }

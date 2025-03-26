@@ -27,19 +27,6 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
         size = 0;
     }
 
-    // Create a List with Copy other.
-    public LinkedListDeque(LinkedListDeque<T> other) {
-        sentinel = new ArbitNode(null, null);
-        sentinel.next = sentinel;
-        sentinel.prev = sentinel;
-        size = 0;
-
-        for (int i = 0; i < other.size(); i++) {
-            T t = other.get(i);
-            this.addLast(t);
-        }
-    }
-
     // Add an item to the front of the deque.
     public void addFirst(T item)  {
         ArbitNode p = sentinel;
@@ -172,13 +159,13 @@ public class LinkedListDeque<T> implements Deque<T>, Iterable<T> {
     }
 
 
-    public static void main(String[] args) {
-        LinkedListDeque<Integer> a = new LinkedListDeque<>();
-        a.addFirst(1);
-        a.addFirst(2);
-        a.addFirst(3);
-        for (int i : a) {
-            System.out.print(i);
-        }
-    }
+//    public static void main(String[] args) {
+//        LinkedListDeque<Integer> a = new LinkedListDeque<>();
+//        a.addFirst(1);
+//        a.addFirst(2);
+//        a.addFirst(3);
+//        for (int i : a) {
+//            System.out.print(i);
+//        }
+//    }
 }

@@ -36,7 +36,4 @@ public class MaxArrayDeque<T> extends ArrayDeque<T> {
         }
         return maxium;
     }
-
-    public static void main(String[] args) {
-    }
 }
