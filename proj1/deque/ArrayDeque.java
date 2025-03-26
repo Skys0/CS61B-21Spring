@@ -77,7 +77,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 
         T item = items[first];
         items[first] = null;
-        first = (first + 1) % items.length;
+        if (size > 1) {
+            first = (first + 1) % items.length;
+        }
         size -= 1;
         return item;
     }
@@ -152,14 +154,8 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
 //    public static void main(String[] args) {
 //        ArrayDeque<Integer> a = new ArrayDeque<>();
 //        a.addLast(0);
-//        a.addLast(1);
+//        System.out.println(a.removeFirst());
 //        a.addLast(2);
-//        a.addLast(3);
-//        a.addLast(4);
-//        System.out.println(a.isEmpty());
-//        System.out.println(a.isEmpty());
-//        a.addLast(7);
-//        System.out.println(a.isEmpty());
 //        System.out.println(a.removeFirst());
 //    }
 }
