@@ -1,5 +1,6 @@
 package deque;
 
+import jh61b.junit.In;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -133,5 +134,24 @@ public class ArrayDequeTest {
         }
 
 
+    }
+
+    @Test
+    public void RandomDequeTest() {
+        ArrayDeque<Integer> ad1 = new ArrayDeque<Integer>();
+        for(int i = 0;i < 50000;i ++) {
+            int opt = (int) (Math.random()*100) % 3;
+            if (opt == 0) {
+                ad1.addFirst(i);
+                int t = ad1.removeFirst();
+                assertEquals("should",i,t);
+            }
+            if(opt == 1) {
+                System.out.println(ad1.removeFirst());
+            }
+            if(opt == 2) {
+                System.out.println(ad1.removeLast());
+            }
+        }
     }
 }
