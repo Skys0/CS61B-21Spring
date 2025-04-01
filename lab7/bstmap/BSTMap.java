@@ -47,7 +47,6 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         if (T == null) {
             return false;
         }
-
         int cmp = key.compareTo(T.key);
         if (cmp < 0) {
             return check(T.left, key);
@@ -107,7 +106,6 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V> {
         if(T == null){
             return;
         }
-
         Print(T.left);
         System.out.print(T.key + " ");
         Print(T.right);
