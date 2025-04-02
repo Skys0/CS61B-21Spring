@@ -224,10 +224,4 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         maxsize *= 2;
         this.buckets = temp.buckets;
     }
-
-    public static void main(String[] args) {
-        MyHashMap<String, String> a = new MyHashMap<>();
-        a.put("hello", "world");
-        a.put("hello", "kevin");
-    }
 }
