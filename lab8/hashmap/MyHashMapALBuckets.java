@@ -1,5 +1,7 @@
 package hashmap;
 
+import org.w3c.dom.Node;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -40,6 +42,6 @@ public class MyHashMapALBuckets<K, V> extends MyHashMap<K, V> {
 
     @Override
     protected Collection<Node> createBucket() {
-        return new ArrayList<>();
+        return new ArrayList<Node>();
     }
 }
