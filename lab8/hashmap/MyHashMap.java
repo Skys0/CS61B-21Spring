@@ -161,7 +161,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
             buckets[h] = createBucket();
         }
         if (containsKey(key)) {
-            for (Node i : buckets[h]) {
+            for (Node i : buckets[h]){
                 if(i.key.equals(key)) {
                     buckets[h].remove(i);
                     size -= 1;
