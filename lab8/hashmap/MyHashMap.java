@@ -71,25 +71,6 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
     private Node createNode(K key, V value) {
         return new Node(key, value);
     }
-
-    /**
-     * Returns a data structure to be a hash table bucket
-     *
-     * The only requirements of a hash table bucket are that we can:
-     *  1. Insert items (`add` method)
-     *  2. Remove items (`remove` method)
-     *  3. Iterate through items (`iterator` method)
-     *
-     * Each of these methods is supported by java.util.Collection,
-     * Most data structures in Java inherit from Collection, so we
-     * can use almost any data structure as our buckets.
-     *
-     * Override this method to use different data structures as
-     * the underlying bucket type
-     *
-     * BE SURE TO CALL THIS FACTORY METHOD INSTEAD OF CREATING YOUR
-     * OWN BUCKET DATA STRUCTURES WITH THE NEW OPERATOR!
-     */
     protected Collection<Node> createBucket() {
         return new ArrayList<Node>();
     }
