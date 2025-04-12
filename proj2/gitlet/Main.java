@@ -17,12 +17,42 @@ public class Main {
         String firstArg = args[0];
         switch(firstArg) {
             case "init":
-                // TODO: handle the `init` command
+                GitletMethod.init();
                 break;
             case "add":
-                // TODO: handle the `add [filename]` command
+                GitletMethod.add(args);
                 break;
-            // TODO: FILL THE REST IN
+            case "rm":
+                GitletMethod.rm(args);
+                break;
+            case "commit":
+                GitletMethod.commit(args);
+                break;
+            case "log":
+                GitletMethod.printLog();
+                break;
+            case "global-log":
+                GitletMethod.printGlobalLog();
+                break;
+            case "find":
+                GitletMethod.Find(args);
+                break;
+            case "status":
+                GitletMethod.status();
+                break;
+            case "checkout":
+                GitletMethod.checkout(args);
+                break;
+            case "branch":
+                GitletMethod.CreateBranch(args);
+                break;
+            case "rm-branch":
+                GitletMethod.rmBranch(args);
+                break;
+            case "reset":
+                break;
+            case "merge":
+                break;
         }
     }
 }

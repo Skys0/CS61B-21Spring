@@ -1,63 +1,73 @@
 package gitlet;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import static gitlet.Utils.*;
 
-/** Represents a gitlet repository.
+/** 表示一个 Gitlet 版本控制系统仓库
  *  @author Skyss7
  */
-public class Repository implements Serializable {
+public class Repository {
     /**
      * List all instance variables of the Repository class here with a useful
      * comment above them describing what that variable represents and how that
      * variable is used. We've provided two examples for you.
      */
 
-    /** The current working directory. */
+    /** 工作目录 */
     public static final File CWD = new File(System.getProperty("user.dir"));
-    /** The .gitlet directory. */
+    /** .gitlet 目录. */
     public static final File GITLET_DIR = join(CWD, ".gitlet");
-    /** The Folder of the objects. */
+    /** Object 的目录 */
     public static final File Object_DIR = join(GITLET_DIR, "objects");
-    /** The Folder of the refs. */
+    /** 各种分支的目录 */
     public static final File Refs_DIR = join(GITLET_DIR, "refs");
-    /** he Folder of the branch. */
-    public static final File heads_DIR = join(Refs_DIR, "heads");
+    /** 其他分支的目录存放地 */
+    public static final File Branch_DIR = join(Refs_DIR, "heads");
+    /**Commit 中的目录 */
+    public static final File Commit_DIR = join(Object_DIR, "commits");
 
-    /** Head of Branch. */
-    public static final File HEAD = join(GITLET_DIR, "HEAD");
+    /** 分支 HEAD */
+    public static final File HEAD = join(Refs_DIR, "HEAD");
 
-    /**The index object which stored refs of added files and removed files and staging file. */
-    public static final File staging_DIR = join(GITLET_DIR, "staging");
-    public static final File TrackFile = join(GITLET_DIR, "Track");
+    /** 索引对象，用于存储已添加文件、已移除文件和暂存文件的引用的目录 */
+    public static final File Staging_DIR = join(GITLET_DIR, "staging");
+    public static final File Remove_DIR = join(GITLET_DIR, "removing");
 
-    /** Create the Repository. */
+
+    /** 创建一个目录 */
     public static void CreateRepository() {
-        ArrayList<File> Dirs = new ArrayList<File>(Arrays.asList(Refs_DIR, Object_DIR, heads_DIR, staging_DIR));
+        ArrayList<File> Dirs = new ArrayList<File>(Arrays.asList(Refs_DIR, Object_DIR, Branch_DIR, Staging_DIR, Remove_DIR, Commit_DIR));
         for (File f : Dirs) {
             if(!f.exists()) {
                 f.mkdir();
             }
         }
-        try {
-            HEAD.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+        // ToDo: 将 master 分支指向这个Commit
+        Date temp = new Date(0);
+        Commit Initize = new Commit("initial commit", temp, "");
+        Initize.SaveCommit();
+        // 将 HEAD 指向新的 Commit
+        Branch.SaveHead("master", Initize.GetCommitSHA());
+        Branch.saveBranch("master", Initize.GetCommitSHA());
+    }
+
+    /** 删除本地文件中的所有文件
+     *  注意：必须慎重使用！！
+     * */
+    public static void removeCWDFiles() {
+        List<String> workingFiles = plainFilenamesIn(CWD);
+
+        if (workingFiles != null) {
+            for (String workFile : workingFiles) {
+                restrictedDelete(join(CWD, workFile));
+            }
         }
-
-        Branch master = new Branch("master", null);
-
-        /* Save the Initial Branch-master. */
-        File masterFile = join(Refs_DIR, master.uid);
-        Utils.writeObject(masterFile, master);
-
-        /* Point out the HEAD to master.*/
-        Utils.writeContents(HEAD, master.uid);
     }
 }

@@ -1,31 +1,53 @@
 package gitlet;
 
-import java.io.Serializable;
+import java.io.File;
+import static gitlet.Repository.*;
+import static gitlet.Utils.*;
 
-/** Provide a branch.
+/** 提供一个分支，基本都是静态方法
  *  @author Skyss7
  */
-public class Branch implements Serializable {
-    /** This class is used to store various branches.*/
-
-    /** The branch of name.*/
-    private String name;
-    /** The branch of SHA-1 called uid. This is unique.*/
-    public String uid;
-    /** This branch of the Pointer of the commit.
-     * Always is the Head.*/
-    private Commit Point;
+public class Branch {
 
 
-    /** Create the branch.*/
-    public Branch(String name, Commit p) {
-        this.name = name;
-        this.Point = p;
-        this.uid = GetBrachName(name, p);
+    /** 保存一个 Branch，内容为它所指的 Commit 的 id
+     *  @param branchName 分支名
+     *  @param commitId 保存的内容
+     * */
+    public static void saveBranch(String branchName, String commitId) {
+        File f = join(Branch_DIR, branchName);
+        writeContents(f, commitId);
     }
 
-    /** Return the SHA-1. */
-    public String GetBrachName(String name,Commit c) {
-        return Utils.sha1(name, c);
+
+    /** 保存 HEAD 中有的分支和所指的 Commit,中间用 : 保存
+     * @param HEADToCommitID HEAD 指向的 Commit 的文件名
+     * @param branch 分支名
+     * */
+    public static void SaveHead(String branch, String HEADToCommitID) {
+        writeContents(HEAD, branch + ":" +HEADToCommitID);
+    }
+
+
+    /** 从 HEAD 中获取分支名字
+     *  @return 直接返回一个文件
+     * */
+    public static File getHeadBranch() {
+        String[] temp = readContentsAsString(HEAD).split(":", 2);
+        File branch = join(Branch_DIR, temp[0]);
+        return branch;
+    }
+
+
+    /** 从这个分支里读取所指文件
+     *  @return 返回 Commit 文件
+     *  @param branch 分支文件
+     * */
+    public static File getBranchCommit(File branch) {
+        if (!branch.exists())
+            return null;
+        String com = readContentsAsString(branch);
+        File Point = join(Commit_DIR, com);
+        return Point;
     }
 }
