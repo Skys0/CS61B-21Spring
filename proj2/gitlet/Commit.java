@@ -118,7 +118,7 @@ public class Commit implements Serializable {
 
        if (commitFiles != null) {
            for (String filename : commitFiles) {
-               if (sub.equals(filename.substring(0, 6))) {
+               if (sub.substring(0, 6).equals(filename.substring(0, 6))) {
                    return join(Commit_DIR, filename);
                }
            }
