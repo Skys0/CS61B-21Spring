@@ -23,8 +23,8 @@ public class Blob implements Serializable {
 
 
     /** 初始化 Blob */
-    public Blob(File f) {
-        context = Utils.readContentsAsString(f);
+    public Blob(File f,String content) {
+        context = content;
         uid = GetBlobName(f);
         FileName = GenerateBlobFile(f);
         FilePath = f.getAbsolutePath();

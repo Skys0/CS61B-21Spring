@@ -104,7 +104,7 @@ public class GitletMethod {
         for (String rem : RemoveFile) {
             File temp = join(Remove_DIR, rem);
             String idFile = readContentsAsString(temp);
-            newCommit.removeBlobMap(rem, idFile);
+            newCommit.removeBlobMap(rem);
             temp.delete();
             cnt += 1;
         }
@@ -146,7 +146,7 @@ public class GitletMethod {
             for (String rem : rmFile) {
                 File temp = join(Remove_DIR, rem);
                 String idFile = readContentsAsString(temp);
-                newCommit.removeBlobMap(rem, idFile);
+                newCommit.removeBlobMap(rem);
                 temp.delete();
             }
         }
@@ -432,22 +432,37 @@ public class GitletMethod {
             System.exit(0);
         }
 
-        if (Track.CheckUntrackFile()) {
-            System.err.println("There is an untracked file in the way; delete it, or add and commit it first.");
-            System.exit(0);
-        }
-
-        removeCWDFiles();
-
         // 遍历整个 Commit 中的文件，一个个恢复
         Commit commit = readObject(f, Commit.class);
         HashMap<String, String> Blobs = commit.getCommitBlobs();
+        HashMap<String, String> HeadBlobs = Commit.GetHeadToCommit().getCommitBlobs();
+
+        // 总的查一遍有没有没被跟踪的，但是要被覆盖的
+        for (String recoverFileName : Blobs.keySet()) {
+            File cwdfile = join(CWD, recoverFileName);
+            if (!HeadBlobs.containsKey(recoverFileName) && cwdfile.exists()) {
+                System.err.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
+            }
+
+        }
+        removeCWDFiles();
 
         for (String recoverFileName : Blobs.keySet()) {
             File recoverFile = join(CWD, recoverFileName);
             Blob temp = readObject(join(Object_DIR, Blobs.get(recoverFileName)), Blob.class);
 
             writeContents(recoverFile, temp.getContext());
+        }
+
+        // 删除暂存区域
+        List<String> stageFile = plainFilenamesIn(Staging_DIR);
+        List<String> removeFile = plainFilenamesIn(Remove_DIR);
+        for (String temp : stageFile) {
+            join(Staging_DIR, temp).delete();
+        }
+        for (String temp : removeFile) {
+            join(Remove_DIR, temp).delete();
         }
 
         // 同时将其 branchHEAD 指向 commit
@@ -508,21 +523,15 @@ public class GitletMethod {
             String currVersion = currBlobs.get(lcaFile);
             String givenVersion = givenBlobs.get(lcaFile);
 
-            // 存在于LCA，当前分支中未修改且给定分支中不存在的文件：删除
-            if (givenVersion == null && lcaVersion.equals(currVersion)) {
-                String[] simulateArgs = {"rm", lcaFile};
-                rm(simulateArgs);
-            }
             // 存在于LCA，在给定分支中未修改且在当前分支中不存在的文件：不变
             // 两者均被修改，两个分支版本不同：冲突
-            if (!CheckStringNull(givenVersion, currVersion) && !lcaVersion.equals(currVersion)
+            if (givenVersion != null && currVersion != null && !lcaVersion.equals(currVersion)
                     && !lcaVersion.equals(givenVersion) && !currVersion.equals(givenVersion)) {
                 DealWithConflict(currCommit, givenCommit, lcaFile);
             }
 
             // 给定的分支修改过，当前分支未修改：先 checkout，在 add
-            if (!CheckStringNull(givenVersion, currVersion) && !lcaVersion.equals(givenVersion)
-                    && lcaVersion.equals(currVersion)) {
+            if (givenVersion != null && !lcaVersion.equals(givenVersion) && lcaVersion.equals(currVersion)) {
                 String[] simulateArgs = {"checkout", givenCommit.GetCommitSHA(), "--", lcaFile};
                 checkout(simulateArgs);
                 simulateArgs = new String[]{"add", lcaFile};
@@ -538,11 +547,11 @@ public class GitletMethod {
             String givenVersion = givenBlobs.get(currFile);
             // 当前分支未修改，给定分支不存在
             if (givenVersion == null && currVersion.equals(lcaVersion)) {
+
                 String[] simulateArgs = {"rm", currFile};
-                System.out.println(1);
                 rm(simulateArgs);
             }
-            // 给定分支不存在，当前分支修改了：冲突
+            // 当前分支修改了，给定分支不存在：冲突
             if (givenVersion == null && lcaVersion != null && !currVersion.equals(lcaVersion)) {
                 DealWithConflict(currCommit, givenCommit, currFile);
             }
@@ -580,7 +589,7 @@ public class GitletMethod {
      * @param trackConflictName 需要解决冲突的文件
      *  */
     public static void DealWithConflict(Commit headCommit, Commit otherHeadCommit,
-                String trackConflictName) {
+                                        String trackConflictName) {
         HashMap<String, String> headBlobs = headCommit.getCommitBlobs();
         HashMap<String, String> otherBlobs = otherHeadCommit.getCommitBlobs();
 
@@ -599,7 +608,7 @@ public class GitletMethod {
         }
 
         // 从其他文件中获取文件内容
-        if (otherBlob.contains(trackConflictName)) {
+        if (otherBlobs.containsKey(trackConflictName)) {
             otherBlob = otherBlobs.get(trackConflictName);
             Blob temp = readObject(join(Object_DIR, otherBlob), Blob.class);
             otherFileContext = temp.getContext();

@@ -66,7 +66,7 @@ public class Repository {
 
         if (workingFiles != null) {
             for (String workFile : workingFiles) {
-                restrictedDelete(join(CWD, workFile));
+                join(CWD, workFile).delete();
             }
         }
     }
@@ -83,12 +83,7 @@ public class Repository {
     /** 给的字符串有没有空的
      *  @return 只要有一个为空，返回 true
      * */
-    public static boolean CheckStringNull(String... strs) {
-        for (String s : strs) {
-            if (s == null) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean CheckStringNull(String s1,String s2) {
+        return (s1 == null || s2 == null);
     }
 }

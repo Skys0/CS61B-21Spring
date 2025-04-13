@@ -82,8 +82,8 @@ public class Commit implements Serializable {
 
 
     /**往 BolbMap 中删除一对文件 */
-    public void removeBlobMap(String key, String value) {
-        BlobMap.remove(key, value);
+    public void removeBlobMap(String key) {
+        BlobMap.remove(key);
     }
 
 

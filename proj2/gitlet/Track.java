@@ -56,7 +56,7 @@ public class Track implements Serializable {
             }
         }
 
-        Blob b = new Blob(file);
+        Blob b = new Blob(file, AddFileContent);
         b.SaveBlob();
 
         // 写入文件到Staging_DIR：文件名为原本名，内容为 SHA-1(uid)
@@ -86,9 +86,7 @@ public class Track implements Serializable {
             writeContents(RemoveFile, "");
 
             // 如果这文件还在工作区里，直接删除就行
-            if (file.exists()) {
-                file.delete();
-            }
+            restrictedDelete(file);
             flag = true;
         }
         return flag;
