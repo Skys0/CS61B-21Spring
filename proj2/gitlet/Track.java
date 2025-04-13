@@ -49,12 +49,10 @@ public class Track implements Serializable {
             String InsertValue = Blob.GetBlobName(file);
             // 两个文件（SHA-1相同=版本相同）
             if (TrackerValue.equals(InsertValue)) {
-                if (stagingFiles.contains(filename)) {
-                    Utils.join(Staging_DIR, filename).delete();
-                }
                 if (removingFiles.contains(filename)) {
                     Utils.join(Remove_DIR, filename).delete();
                 }
+                return;
             }
         }
 
@@ -73,14 +71,13 @@ public class Track implements Serializable {
     public static boolean remove(File file) {
         boolean flag = false;
         String filename = file.getName();
-        String rmFileContent = Utils.readContentsAsString(file);
-        Commit headCommit = new Commit();
-        // ToDO: new Commit;
+        Commit headCommit = Commit.GetHeadToCommit();
         HashMap<String, String> Blobs = headCommit.getCommitBlobs();
 
         File StageFile = Utils.join(Staging_DIR, filename);
         // 如果这个文件在暂存区内就删掉
         if (StageFile.exists()) {
+            flag = true;
             StageFile.delete();
         }
         // 如果这个被跟踪了，我们去添加到暂存删除区中

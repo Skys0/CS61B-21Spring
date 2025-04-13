@@ -70,4 +70,25 @@ public class Repository {
             }
         }
     }
+
+    /** 查找两个暂存区有没有文件
+     *  @return 是否有文件
+     * */
+    public static boolean ExistStageFile() {
+        List<String> add = plainFilenamesIn(Staging_DIR);
+        List<String> removing = plainFilenamesIn(Remove_DIR);
+        return (!add.isEmpty() || !removing.isEmpty());
+    }
+
+    /** 给的字符串有没有空的
+     *  @return 只要有一个为空，返回 true
+     * */
+    public static boolean CheckStringNull(String... strs) {
+        for (String s : strs) {
+            if (s == null) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

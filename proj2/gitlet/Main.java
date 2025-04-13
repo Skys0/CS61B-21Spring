@@ -50,8 +50,10 @@ public class Main {
                 GitletMethod.rmBranch(args);
                 break;
             case "reset":
+                GitletMethod.reset(args);
                 break;
             case "merge":
+                GitletMethod.merge(args);
                 break;
         }
     }

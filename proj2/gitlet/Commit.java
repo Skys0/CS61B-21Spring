@@ -25,6 +25,8 @@ public class Commit implements Serializable {
     private HashMap<String,String> BlobMap;
     /** 前一个 Commit 的指针（用文件id来找） */
     private String PreCommitID;
+    /** 另一个父亲指针 */
+    private String OtherPreCommitID;
 
     /** 创建一个Commit */
     public Commit(String m, Date t,String id) {
@@ -32,9 +34,6 @@ public class Commit implements Serializable {
         TimeStamp = t;
         this.PreCommitID = id;
         BlobMap = new HashMap<String, String>();
-    }
-
-    public Commit() {
     }
 
     public Commit(Commit parent) {
@@ -52,8 +51,12 @@ public class Commit implements Serializable {
         this.TimeStamp = date;
     }
 
-    public void setPreCommitID(String preCommitID) {
-        this.PreCommitID = preCommitID;
+    public void setPreCommitID(String preCommitid) {
+        this.PreCommitID = preCommitid;
+    }
+
+    public void setOtherPreCommitID(String otherPreCommitID) {
+        this.OtherPreCommitID = otherPreCommitID;
     }
 
     public HashMap<String, String> getCommitBlobs() {
@@ -66,6 +69,10 @@ public class Commit implements Serializable {
 
     public String getPreCommitID() {
         return this.PreCommitID;
+    }
+
+    public String getOtherPreCommitID() {
+        return this.OtherPreCommitID;
     }
 
     /**往 BolbMap 中添加一对文件 */
@@ -126,4 +133,33 @@ public class Commit implements Serializable {
        return null;
     }
 
+    /** 迭代向上找祖先
+     * @return 上一个 Commit 类
+     * */
+    public Commit GetpreCommit() {
+        File temp = join(Commit_DIR, PreCommitID);
+        Commit pre = readObject(temp, Commit.class);
+        return pre;
+    }
+
+    /** 生成相应的文件*/
+    public File SetCommitFile() {
+        return Utils.join(Commit_DIR, this.GetCommitSHA());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        if (!(o instanceof Commit)) {
+            return false;
+        }
+
+        Commit obj = (Commit) o;
+        return this.SetCommitFile().equals(obj.SetCommitFile());
+    }
 }

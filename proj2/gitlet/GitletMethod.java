@@ -87,8 +87,54 @@ public class GitletMethod {
         List<String> StagingFile = plainFilenamesIn(Staging_DIR);
         List<String> RemoveFile = plainFilenamesIn(Remove_DIR);
 
-        if (StagingFile != null) {
-            for (String stag : StagingFile) {
+        if (StagingFile.isEmpty() && RemoveFile.isEmpty()) {
+            System.err.println("No changes added to the commit.");
+            System.exit(0);
+        }
+
+        int cnt = 0;
+        for (String stag : StagingFile) {
+            File temp = join(Staging_DIR, stag);
+            String idFile = readContentsAsString(temp);
+            newCommit.addBlobMap(stag, idFile);
+            temp.delete();
+            cnt += 1;
+        }
+
+        for (String rem : RemoveFile) {
+            File temp = join(Remove_DIR, rem);
+            String idFile = readContentsAsString(temp);
+            newCommit.removeBlobMap(rem, idFile);
+            temp.delete();
+            cnt += 1;
+        }
+
+        if (cnt == 0) {
+            System.err.println("No changes added to the commit.");
+            System.exit(0);
+        }
+
+        // 保存至 HEAD
+        newCommit.SaveCommit();
+        Branch.SaveHead(Branch.getHeadBranch().getName(), newCommit.GetCommitSHA());
+        Branch.saveBranch(Branch.getHeadBranch().getName(), newCommit.GetCommitSHA());
+        // 这里两个都得保存，不然在移动分支的时候会回到 init 的时候
+    }
+
+    /**对应 Merge 中的自动 Commit
+     * */
+    public static void MergeCommit(String message, Commit headCommit,Commit otherCommit,Date times) {
+        Commit newCommit = new Commit(headCommit);
+        newCommit.setMessage(message);
+        newCommit.setTimeStamp(times);
+        newCommit.setPreCommitID(headCommit.GetCommitSHA());
+        newCommit.setOtherPreCommitID(otherCommit.GetCommitSHA());
+
+        List<String> stagingFile = plainFilenamesIn(Staging_DIR);
+        List<String> rmFile = plainFilenamesIn(Remove_DIR);
+
+        if (stagingFile != null) {
+            for (String stag : stagingFile) {
                 File temp = join(Staging_DIR, stag);
                 String idFile = readContentsAsString(temp);
                 newCommit.addBlobMap(stag, idFile);
@@ -96,20 +142,17 @@ public class GitletMethod {
             }
         }
 
-        if (RemoveFile != null) {
-            for (String rem : RemoveFile) {
-                File temp = join(rem, rem);
+        if (rmFile != null) {
+            for (String rem : rmFile) {
+                File temp = join(Remove_DIR, rem);
                 String idFile = readContentsAsString(temp);
                 newCommit.removeBlobMap(rem, idFile);
                 temp.delete();
             }
         }
-
-        // 保存至 HEAD
         newCommit.SaveCommit();
-        Branch.SaveHead("master", newCommit.GetCommitSHA());
-        Branch.saveBranch("master", newCommit.GetCommitSHA());
-        // 这里两个都得保存，不然在移动分支的时候会回到 init 的时候
+        Branch.SaveHead(Branch.getHeadBranch().getName(), newCommit.GetCommitSHA());
+        Branch.saveBranch(Branch.getHeadBranch().getName(), newCommit.GetCommitSHA());
     }
 
 
@@ -317,7 +360,7 @@ public class GitletMethod {
         }
 
         // 如果该分支是当前分支
-        if (branchFile.equals(Branch.getHeadBranch())) {
+        if (branch.equals(Branch.getHeadBranch())) {
             System.err.println("No need to checkout the current branch.");
             System.exit(0);
         }
@@ -414,5 +457,164 @@ public class GitletMethod {
     }
 
 
+    /** 对应 merge 命令
+     *
+     *  Usage: java gitlet.Main merge [branch name]
+     * */
+    public static void merge(String[] args) {
+        if (ExistStageFile()) {
+            System.err.println("You have uncommitted changes.");
+            System.exit(0);
+        }
+        File branch1 = Branch.getHeadBranch();
+        File branch2 = join(Branch_DIR, args[1]);
 
+        if (!branch2.exists()) {
+            System.err.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+        if (branch1.equals(branch2)) {
+            System.err.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
+
+
+        // LCA 最近公共祖先（分歧点），currCommit 为当前分支，givenCommit 为给定分支
+        Commit LCA = Branch.GetBranchLCA(branch1, branch2);
+        Commit currCommit = Commit.GetHeadToCommit();
+        Commit givenCommit = readObject(Branch.getBranchCommit(branch2), Commit.class);
+
+        // 分歧点与给定分支相同
+        if (LCA.equals(givenCommit)) {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            System.exit(0);
+        }
+        // 分歧点与当前分支相同
+        if (LCA.equals(currCommit)) {
+            // 模拟直接 checkout
+            String[] simulationArgs = {"checkout", args[1]};
+            checkout(simulationArgs);
+            System.out.println("Current branch fast-forwarded.");
+            System.exit(0);
+        }
+        // 分歧点既不是当前分支也不是给定分支
+        HashMap<String, String> LCABlobs = LCA.getCommitBlobs();
+        HashMap<String, String> currBlobs = currCommit.getCommitBlobs();
+        HashMap<String, String> givenBlobs = givenCommit.getCommitBlobs();
+
+        // 先对 LCA 的文件进行遍历
+        for (String lcaFile : LCABlobs.keySet()) {
+            String lcaVersion = LCABlobs.get(lcaFile);
+            String currVersion = currBlobs.get(lcaFile);
+            String givenVersion = givenBlobs.get(lcaFile);
+
+            // 存在于LCA，当前分支中未修改且给定分支中不存在的文件：删除
+            if (givenVersion == null && lcaVersion.equals(currVersion)) {
+                String[] simulateArgs = {"rm", lcaFile};
+                rm(simulateArgs);
+            }
+            // 存在于LCA，在给定分支中未修改且在当前分支中不存在的文件：不变
+            // 两者均被修改，两个分支版本不同：冲突
+            if (!CheckStringNull(givenVersion, currVersion) && !lcaVersion.equals(currVersion)
+                    && !lcaVersion.equals(givenVersion) && !currVersion.equals(givenVersion)) {
+                DealWithConflict(currCommit, givenCommit, lcaFile);
+            }
+
+            // 给定的分支修改过，当前分支未修改：先 checkout，在 add
+            if (!CheckStringNull(givenVersion, currVersion) && !lcaVersion.equals(givenVersion)
+                    && lcaVersion.equals(currVersion)) {
+                String[] simulateArgs = {"checkout", givenCommit.GetCommitSHA(), "--", lcaFile};
+                checkout(simulateArgs);
+                simulateArgs = new String[]{"add", lcaFile};
+                add(simulateArgs);
+            }
+            // 有一个被删除的情况我们下面来讨论
+        }
+
+        // 对所有当前分支的文件进行操作
+        for (String currFile : currBlobs.keySet()) {
+            String lcaVersion = LCABlobs.get(currFile);
+            String currVersion = currBlobs.get(currFile);
+            String givenVersion = givenBlobs.get(currFile);
+            // 当前分支未修改，给定分支不存在
+            if (givenVersion == null && currVersion.equals(lcaVersion)) {
+                String[] simulateArgs = {"rm", currFile};
+                System.out.println(1);
+                rm(simulateArgs);
+            }
+            // 给定分支不存在，当前分支修改了：冲突
+            if (givenVersion == null && lcaVersion != null && !currVersion.equals(lcaVersion)) {
+                DealWithConflict(currCommit, givenCommit, currFile);
+            }
+            // 在拆分点不存在，但是两个版本不相同：冲突
+            if (lcaVersion == null && givenVersion != null && !currVersion.equals(givenVersion)) {
+                DealWithConflict(currCommit, givenCommit, currFile);
+            }
+        }
+
+        for (String givenFile : givenBlobs.keySet()) {
+            String lcaVersion = LCABlobs.get(givenFile);
+            String currVersion = currBlobs.get(givenFile);
+            String givenVersion = givenBlobs.get(givenFile);
+            // 在拆分点不存在且仅存在于给定分支中的文件都应该被签出并暂存
+            if (lcaVersion == null && currVersion == null) {
+                String[] simulateArgs = {"checkout", givenCommit.GetCommitSHA(), "--", givenFile};
+                checkout(simulateArgs);
+                simulateArgs = new String[]{"add", givenFile};
+                add(simulateArgs);
+            }
+            // 当前分支不存在，给定分支修改了：冲突
+            if (currVersion == null && lcaVersion != null && !givenVersion.equals(lcaVersion)) {
+                DealWithConflict(currCommit, givenCommit, givenVersion);
+            }
+        }
+        Date times = new Date();
+        String message = String.format("Merged %s into %s.", branch2.getName(), branch1.getName());
+        MergeCommit(message, currCommit, givenCommit, times);
+    }
+
+
+    /** 处理文件冲突
+     * @param headCommit 当前分支所指的提交
+     * @param otherHeadCommit 给定分支所指的提交
+     * @param trackConflictName 需要解决冲突的文件
+     *  */
+    public static void DealWithConflict(Commit headCommit, Commit otherHeadCommit,
+                String trackConflictName) {
+        HashMap<String, String> headBlobs = headCommit.getCommitBlobs();
+        HashMap<String, String> otherBlobs = otherHeadCommit.getCommitBlobs();
+
+        String headFileContext = "";
+        String headBlob = "";
+        String otherFileContext = "";
+        String otherBlob = "";
+
+        System.out.println("Encountered a merge conflict.");
+
+        // 从 HEAD 中获取文件内容
+        if (headBlobs.containsKey(trackConflictName)) {
+            headBlob = headBlobs.get(trackConflictName);
+            Blob temp = readObject(join(Object_DIR, headBlob), Blob.class);
+            headFileContext = temp.getContext();
+        }
+
+        // 从其他文件中获取文件内容
+        if (otherBlob.contains(trackConflictName)) {
+            otherBlob = otherBlobs.get(trackConflictName);
+            Blob temp = readObject(join(Object_DIR, otherBlob), Blob.class);
+            otherFileContext = temp.getContext();
+        }
+
+        StringBuilder inputString = new StringBuilder();
+        inputString.append("<<<<<<< HEAD\n");
+        inputString.append(headFileContext);
+        inputString.append("=======\n");
+        inputString.append(otherFileContext);
+        inputString.append(">>>>>>>\n");
+
+        // 将冲突写入文件，并暂存结果
+        writeContents(join(CWD, trackConflictName), inputString.toString());
+        String[] simulationArgs = new String[]{"add", trackConflictName};
+        add(simulationArgs);
+    }
 }

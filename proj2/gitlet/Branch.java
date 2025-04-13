@@ -50,4 +50,21 @@ public class Branch {
         File Point = join(Commit_DIR, com);
         return Point;
     }
+
+    /**
+     * 找到两个 Branch 的公共祖先
+     * @param branch1 当前分支
+     * @param branch2 给定分支
+     * @return 公共祖先的文件
+     */
+    public static Commit GetBranchLCA(File branch1, File branch2) {
+        Commit com1 = readObject(getBranchCommit(branch1), Commit.class);
+        Commit com2 = readObject(getBranchCommit(branch2), Commit.class);
+        while (!com1.equals(com2)) {
+            com1 = com1.GetpreCommit();
+            com2 = com2.GetpreCommit();
+        }
+
+        return com1;
+    }
 }
