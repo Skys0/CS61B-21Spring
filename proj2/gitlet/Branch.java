@@ -1,6 +1,9 @@
 package gitlet;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
+
 import static gitlet.Repository.*;
 import static gitlet.Utils.*;
 
@@ -60,11 +63,25 @@ public class Branch {
     public static Commit GetBranchLCA(File branch1, File branch2) {
         Commit com1 = readObject(getBranchCommit(branch1), Commit.class);
         Commit com2 = readObject(getBranchCommit(branch2), Commit.class);
-        while (!com1.equals(com2)) {
+        Set<String> com1Ancestor = new HashSet<String>();
+        while (true) {
+            com1Ancestor.add(com1.GetCommitSHA());
+            if (com1.getPreCommitID().equals("")) {
+                break;
+            }
             com1 = com1.GetpreCommit();
-            com2 = com2.GetpreCommit();
         }
 
-        return com1;
+
+        while (true) {
+            if (com1Ancestor.contains(com2.GetCommitSHA())) {
+                return com2;
+            }
+            if (com2.getPreCommitID().equals("")) {
+                break;
+            }
+            com2 = com2.GetpreCommit();
+        }
+        return null;
     }
 }

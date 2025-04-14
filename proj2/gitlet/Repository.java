@@ -86,4 +86,20 @@ public class Repository {
     public static boolean CheckStringNull(String s1,String s2) {
         return (s1 == null || s2 == null);
     }
+
+    /** 没查找到指令报错*/
+    public static void NoCommand() {
+        System.err.println("No command with that name exists.");
+        System.exit(0);
+    }
+
+    /** 每个函数都要检查是否 init
+     *  如果没有 .gitlet 就报错
+     * */
+    public static void CheckIfInit() {
+        if (!GITLET_DIR.exists()) {
+            System.err.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
+    }
 }
