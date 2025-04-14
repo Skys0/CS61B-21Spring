@@ -99,7 +99,6 @@ public class Branch {
                     deq2.add(temp2.GetpreOtherCommit());
                 }
             }
-
         }
         return null;
     }
