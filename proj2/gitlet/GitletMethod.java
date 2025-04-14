@@ -1,12 +1,11 @@
 package gitlet;
 
 import java.io.File;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import static gitlet.Repository.*;
 import static gitlet.Utils.*;
+import static java.util.Collections.sort;
 
 /**
  * 表示 Gitlet 命令
@@ -237,7 +236,6 @@ public class GitletMethod {
 
     /** 对应 status 命令
      *  显示当前存在的分支，暂存添加，暂存删除的文件
-     *  ToDo: 我们先实现不完整的，后面在加
      *  Usage: java gitlet.Main status
      * */
     public static void status() {
@@ -277,11 +275,52 @@ public class GitletMethod {
         }
         System.out.print("\n");
         System.out.println("=== Modifications Not Staged For Commit ===");
-        // 剩下的没有实现
+        List<String> outputFiles = new ArrayList<String>();
+        HashMap<String,String> blobs = Commit.GetHeadToCommit().getCommitBlobs();
+        List<String> CWDFile = plainFilenamesIn(CWD);
+
+        // 在当前提交中跟踪，在工作目录中更改，但未暂存
+        for (String f : CWDFile) {
+            if (blobs.containsKey(f)) {
+                File temp = join(CWD, f);
+                File t = join(Staging_DIR, f);
+                if (!Blob.GetBlobName(temp).equals(blobs.get(f)) && !t.exists()) {
+                    outputFiles.add(f + "(modified)");
+                }
+            }
+        }
+        // 暂存以进行添加，但内容与工作目录中的内容不同
+        // 暂存以进行添加，但在工作目录中删除
+         for (String f : stagingFiles) {
+             File temp = join(CWD, f);
+             File t = join(Staging_DIR, f);
+             if (!temp.exists()) {
+                 outputFiles.add(f + "(deleted)");
+             }
+             if (!Blob.GetBlobName(temp).equals(readContentsAsString(t))) {
+                 outputFiles.add(f + "(modified)");
+             }
+         }
+         // 不是暂存以供删除，而是在当前提交中跟踪并从工作目录中删除
+        for (String f : blobs.keySet()) {
+            File temp = join(CWD, f);
+            if (!temp.exists()) {
+                outputFiles.add(f + "(deleted)");
+            }
+        }
+        // 排序后输出
+        sort(outputFiles);
+        for (String s : outputFiles) {
+            System.out.println(s);
+        }
 
         System.out.print("\n");
         System.out.println("=== Untracked Files ===");
-
+        for (String f : CWDFile) {
+            if (!blobs.containsKey(f)) {
+                System.out.println(f);
+            }
+        }
         System.out.print("\n");
     }
 
