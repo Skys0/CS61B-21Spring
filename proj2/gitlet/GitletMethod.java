@@ -304,7 +304,7 @@ public class GitletMethod {
          // 不是暂存以供删除，而是在当前提交中跟踪并从工作目录中删除
         for (String f : blobs.keySet()) {
             File temp = join(CWD, f);
-            if (!temp.exists()) {
+            if (!temp.exists() && !removeFiles.contains(f)) {
                 outputFiles.add(f + "(deleted)");
             }
         }
@@ -317,7 +317,7 @@ public class GitletMethod {
         System.out.print("\n");
         System.out.println("=== Untracked Files ===");
         for (String f : CWDFile) {
-            if (!blobs.containsKey(f)) {
+            if (!blobs.containsKey(f) && !removeFiles.contains(f) && !stagingFiles.contains(f)) {
                 System.out.println(f);
             }
         }
