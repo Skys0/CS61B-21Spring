@@ -142,6 +142,12 @@ public class Commit implements Serializable {
         return pre;
     }
 
+    public Commit GetpreOtherCommit() {
+        File temp = join(Commit_DIR, OtherPreCommitID);
+        Commit pre = readObject(temp, Commit.class);
+        return pre;
+    }
+
     /** 生成相应的文件*/
     public File SetCommitFile() {
         return Utils.join(Commit_DIR, this.GetCommitSHA());

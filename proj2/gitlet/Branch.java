@@ -1,8 +1,8 @@
 package gitlet;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Set;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 
 import static gitlet.Repository.*;
 import static gitlet.Utils.*;
@@ -63,24 +63,43 @@ public class Branch {
     public static Commit GetBranchLCA(File branch1, File branch2) {
         Commit com1 = readObject(getBranchCommit(branch1), Commit.class);
         Commit com2 = readObject(getBranchCommit(branch2), Commit.class);
+        Deque<Commit> deq1 = new ArrayDeque<Commit>();
+        Deque<Commit> deq2 = new ArrayDeque<Commit>();
         Set<String> com1Ancestor = new HashSet<String>();
-        while (true) {
-            com1Ancestor.add(com1.GetCommitSHA());
-            if (com1.getPreCommitID().equals("")) {
-                break;
+        deq1.add(com1);
+        deq2.add(com2);
+        com1Ancestor.add(com1.GetCommitSHA());
+
+        while (!deq1.isEmpty()) {
+            Commit temp1 = deq1.poll();
+            if (temp1 != null) {
+                if (!temp1.getPreCommitID().isEmpty()) {
+                    com1Ancestor.add(temp1.GetpreCommit().GetCommitSHA());
+                    deq1.add(temp1.GetpreCommit());
+                }
+
+                if (temp1.getOtherPreCommitID() != null) {
+                    com1Ancestor.add(temp1.GetpreOtherCommit().GetCommitSHA());
+                    deq1.add(temp1.GetpreOtherCommit());
+                }
             }
-            com1 = com1.GetpreCommit();
         }
 
+        while (!deq2.isEmpty()) {
+            Commit temp2 = deq2.poll();
+            if (temp2 != null) {
+                if (com1Ancestor.contains(temp2.GetCommitSHA())) {
+                    return temp2;
+                }
+                if (!temp2.getPreCommitID().isEmpty()) {
+                    deq2.add(temp2.GetpreCommit());
+                }
 
-        while (true) {
-            if (com1Ancestor.contains(com2.GetCommitSHA())) {
-                return com2;
+                if (temp2.getOtherPreCommitID() != null) {
+                    deq2.add(temp2.GetpreOtherCommit());
+                }
             }
-            if (com2.getPreCommitID().equals("")) {
-                break;
-            }
-            com2 = com2.GetpreCommit();
+
         }
         return null;
     }

@@ -76,6 +76,11 @@ public class GitletMethod {
             System.exit(0);
         }
 
+        if (args[1].equals("")) {
+            System.err.println("Please enter a commit message.");
+            System.exit(0);
+        }
+
         // 获取*现在*的 Commit 与现在要提交的 Commit 逐一比较再对比更改
         Commit oldCommit = Commit.GetHeadToCommit();
         Commit newCommit = new Commit(oldCommit);
@@ -419,7 +424,7 @@ public class GitletMethod {
             System.exit(0);
         }
 
-        restrictedDelete(branch);
+        branch.delete();
     }
 
     /** 对应 reset 命令
@@ -490,6 +495,11 @@ public class GitletMethod {
         }
         if (branch1.equals(branch2)) {
             System.err.println("Cannot merge a branch with itself.");
+            System.exit(0);
+        }
+
+        if (Track.CheckUntrackFile()) {
+            System.err.println("There is an untracked file in the way; delete it, or add and commit it first.");
             System.exit(0);
         }
 
