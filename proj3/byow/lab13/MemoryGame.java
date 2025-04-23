@@ -1,11 +1,11 @@
 package byow.lab13;
 
-import byow.Core.RandomUtils;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.util.Random;
+import java.util.Stack;
 
 public class MemoryGame {
     /** The width of the window of this game. */
@@ -46,39 +46,97 @@ public class MemoryGame {
         this.width = width;
         this.height = height;
         StdDraw.setCanvasSize(this.width * 16, this.height * 16);
-        Font font = new Font("Monaco", Font.BOLD, 30);
+        Font font = new Font("Monaco", Font.BOLD, 25);
         StdDraw.setFont(font);
         StdDraw.setXscale(0, this.width);
         StdDraw.setYscale(0, this.height);
         StdDraw.clear(Color.BLACK);
         StdDraw.enableDoubleBuffering();
 
-        //TODO: Initialize random number generator
+        StdDraw.setPenColor(Color.white);
+        rand = new Random(seed);
     }
 
     public String generateRandomString(int n) {
-        //TODO: Generate random string of letters of length n
-        return null;
+        int cnt = 0;
+        String RamdomString = "";
+        while (cnt < n) {
+            char x = CHARACTERS[rand.nextInt(26)];
+            RamdomString = RamdomString + x;
+            cnt += 1;
+        }
+        return RamdomString;
     }
 
     public void drawFrame(String s) {
-        //TODO: Take the string and display it in the center of the screen
-        //TODO: If game is not over, display relevant game information at the top of the screen
+        StdDraw.clear(Color.BLACK);
+        try {
+            Thread.sleep(500);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // 上面的固定的文字
+        String roundText = "Round: " + String.valueOf(round);
+        StdDraw.text((double) roundText.length() / 2, this.width - 1, roundText);
+        StdDraw.text((double) this.height / 2, this.width - 1, "Watch!");
+
+
+        String encourage = ENCOURAGEMENT[rand.nextInt(6)];
+        StdDraw.text(this.height - (double) encourage.length() / 2 + 1, this.width - 1, encourage);
+        StdDraw.line(0,this.width - 2,this.height, this.width - 2);
+
+        StdDraw.text((double) this.width / 2, (double) this.height / 2, s);
+        StdDraw.show();
     }
 
     public void flashSequence(String letters) {
-        //TODO: Display each character in letters, making sure to blank the screen between letters
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        char[] letter = letters.toCharArray();
+        for (char t : letter) {
+            String temp = String.valueOf(t);
+            drawFrame(temp);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public String solicitNCharsInput(int n) {
-        //TODO: Read n letters of player input
-        return null;
+        StringBuilder letters = new StringBuilder();
+        int cnt = 0;
+        while (cnt < n) {
+            if (StdDraw.hasNextKeyTyped()) {
+                char x = StdDraw.nextKeyTyped();
+                letters.append(x);
+                drawFrame(letters.toString());
+                cnt += 1;
+            }
+        }
+        return letters.toString();
     }
 
     public void startGame() {
-        //TODO: Set any relevant variables before the game starts
-
-        //TODO: Establish Engine loop
+        round = 1;
+        while (true) {
+            String s = "Round " + round + "!";
+            drawFrame(s);
+            String showString = generateRandomString(round);
+            flashSequence(showString);
+            drawFrame("");
+            String inputString = solicitNCharsInput(round);
+            if (inputString.equals(showString)) {
+                round += 1;
+            } else {
+                drawFrame("You lose! You made it to Round : " + round);
+                break;
+            }
+        }
     }
-
 }
