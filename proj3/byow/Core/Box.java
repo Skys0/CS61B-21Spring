@@ -16,10 +16,10 @@ public class Box {
     private int width;
 
     public Box(Random r) {
-        this.x = r.nextInt(bottomX / 2, topX / 2) * 2 + 1;
-        this.y = r.nextInt(bottomY / 2, topY / 2) * 2 + 1;
-        this.height = r.nextInt(1,4) * 2 + 3;
-        this.width = r.nextInt(1, 4) * 2 + 3;
+        this.x = randomBound(r, bottomX / 2, topX / 2) * 2 + 1;
+        this.y = randomBound(r, bottomY / 2, topY / 2) * 2 + 1;
+        this.height = randomBound(r, 1, 4) * 2 + 3;
+        this.width = randomBound(r, 1, 4) * 2 + 3;
     }
 
     /** 在这个盒子中随机得到一个边缘点，返回一个int数组，只有两个元素，x，y

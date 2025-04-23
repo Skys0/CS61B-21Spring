@@ -32,7 +32,7 @@ public class RandomCityGenerator {
         // 第一部分：在整个地图中生成一些盒子，就相当于房间
         // 生成随机盒子的大小以及数量，不能特别大
         int cnt = 0;
-        int amountBox = r.nextInt(10, 15);
+        int amountBox = randomBound(r, 10, 15);
         List<Box> boxes = new ArrayList<Box>();
         for (int i = bottomX ;i <= topX;i += 2) {
             for (int j = bottomY;j <= topY;j += 2) {
@@ -246,6 +246,10 @@ public class RandomCityGenerator {
         }
 
         return cnt == 3;
+    }
+
+    public static int randomBound(Random r, int origin,int bound) {
+       return r.nextInt(bound - origin + 1) + origin;
     }
 
 

@@ -54,7 +54,7 @@ public class Flood {
                 if (nextPos.contains(lastDir) && r.nextInt(100) > windingPercent) {
                     dir = lastDir;
                 } else {
-                    int temp = r.nextInt(0, nextPos.size());
+                    int temp = r.nextInt(nextPos.size());
                     dir = nextPos.get(temp);
                 }
                 // 将所有生成的点加入 kruskal 并查集中
