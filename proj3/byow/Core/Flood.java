@@ -57,7 +57,6 @@ public class Flood {
                     int temp = r.nextInt(nextPos.size());
                     dir = nextPos.get(temp);
                 }
-                // 将所有生成的点加入 kruskal 并查集中
                 Move(world, new Point(cell.x + dir.x, cell.y + dir.y));
 
 

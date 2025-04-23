@@ -2,8 +2,11 @@ package byow.Core;
 
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
+import edu.princeton.cs.introcs.StdDraw;
 
 import java.util.Random;
+
+import static byow.Core.RandomCityGenerator.*;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -16,6 +19,23 @@ public class Engine {
      * including inputs from the main menu.
      */
     public void interactWithKeyboard() {
+        MainMenu.ShowMainMenu(40, 40);
+        char x = KeyBoradInput.InputSingleWord();
+        if (x == 'N' || x == 'n') {
+            long seed = 0;
+            seed = KeyBoradInput.InputSeed();
+            Random r = new Random(seed);
+            TERenderer ter = new TERenderer();
+            ter.initialize(WIDTH, HEIGHT);
+            TETile[][] world = RandomGenerator(r);
+            ter.renderFrame(world);
+
+        } else if (x == 'L' || x == 'l') {
+
+        } else if (x == 'Q' || x == 'q') {
+            System.exit(0);
+        }
+
     }
 
     /**
@@ -48,7 +68,7 @@ public class Engine {
         // that works for many different input types.
         Long seed = Long.parseLong(input.substring(1, input.length() - 1));
         Random r = new Random(seed);
-        TETile[][] finalWorldFrame = RandomCityGenerator.RandomGenerator(r);
+        TETile[][] finalWorldFrame = RandomGenerator(r);
         return finalWorldFrame;
     }
 }

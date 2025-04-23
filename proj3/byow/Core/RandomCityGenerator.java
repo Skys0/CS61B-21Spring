@@ -10,9 +10,9 @@ import java.util.Random;
 import java.util.Stack;
 
 public class RandomCityGenerator {
-    public static final int Width = 71;
-    public static final int Height = 51;
-    public static final double Contain = 0.7;
+    public static final int Width = 80;
+    public static final int Height = 30;
+    public static final double Contain = 0.6;
     public static final int[][] next = {{0, 1}, {1, 0}, {-1, 0}, {0, -1}, {1, 1}, {-1, -1}, {-1, 1}, {1, -1}};
     public static final int bottomX =  (int) Math.round(Width / 2 - Width*Contain / 2) / 2 * 2 + 1;
     public static final int topX = (int) Math.round(Width / 2 + Width*Contain / 2) / 2 * 2 + 1;
@@ -32,7 +32,7 @@ public class RandomCityGenerator {
         // 第一部分：在整个地图中生成一些盒子，就相当于房间
         // 生成随机盒子的大小以及数量，不能特别大
         int cnt = 0;
-        int amountBox = randomBound(r, 10, 15);
+        int amountBox = randomBound(r, 4, 7);
         List<Box> boxes = new ArrayList<Box>();
         for (int i = bottomX ;i <= topX;i += 2) {
             for (int j = bottomY;j <= topY;j += 2) {
