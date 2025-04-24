@@ -153,6 +153,6 @@ public class HexWorld {
             genSingleHexagon(titles, size, centerY - x * 2, i * sizeSeq.size() * 2 + 1 + sizeSeq.size() + sizeSeq.size());
             genSingleHexagon(titles, size, centerY + x * 2, i * sizeSeq.size() * 2 + 1 + sizeSeq.size() + sizeSeq.size());
         }
-        ter.renderFrame(titles);
+        ter.renderFrame(titles, null);
     }
 }

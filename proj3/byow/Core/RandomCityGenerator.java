@@ -157,12 +157,12 @@ public class RandomCityGenerator {
             int top = b.gety() + 1;
             int bottom = b.gety() - b.getHeight();
             for (int i = b.getx();i < b.getx() + b.getWidth();i ++) {
-                if (CheckConnection(city, i, top)) {
+                if (CheckConnection(city, new Point(i, top))) {
                     points.add(new Point(i, top));
                 }
             }
             for (int i = b.getx();i < b.getx() + b.getWidth();i ++) {
-                if (CheckConnection(city, i, bottom)) {
+                if (CheckConnection(city, new Point(i, bottom))) {
                     points.add(new Point(i, bottom));
                 }
             }
@@ -170,12 +170,12 @@ public class RandomCityGenerator {
             top = b.getx() - 1;
             bottom = b.getx() + b.getWidth();
             for (int i = b.gety();i > b.gety() - b.getHeight();i --) {
-                if (CheckConnection(city, top, i)) {
+                if (CheckConnection(city, new Point(top, i))) {
                     points.add(new Point(top, i));
                 }
             }
             for (int i = b.gety();i > b.gety() - b.getHeight();i --) {
-                if (CheckConnection(city, bottom, i)) {
+                if (CheckConnection(city, new Point(bottom, i))) {
                     points.add(new Point(bottom, i));
                 }
             }
@@ -186,13 +186,13 @@ public class RandomCityGenerator {
 
     /** 检查是否能成为连接点
      * @param city 地图
-     * @param x,y 横纵坐标
+     * @param p 横纵坐标
      * */
-    public static boolean CheckConnection(TETile[][] city, int x, int y) {
+    public static boolean CheckConnection(TETile[][] city, Point p) {
         int cnt = 0;
         for (int i = 0;i < 4;i ++) {
-            int tx = x + next[i][0];
-            int ty = y + next[i][1];
+            int tx = p.x + next[i][0];
+            int ty = p.y + next[i][1];
             if (city[tx][ty] == Tileset.NOTHING) {
                 cnt ++;
             }
@@ -235,7 +235,9 @@ public class RandomCityGenerator {
     }
 
 
-    /** 判断是否为死胡同，是死胡同则返回 True */
+    /** 判断是否为死胡同，是死胡同则返回 True
+     * @param city 世界
+     * @param p 需要判断的点*/
     public static boolean IsDeadEnd(TETile[][] city, Point p) {
         int cnt = 0;
         for (int i = 0;i < 4;i ++) {
@@ -248,19 +250,19 @@ public class RandomCityGenerator {
         return cnt == 3;
     }
 
+    /** Random 随机生成 从 origin 到 bound 的随机数
+     * @param r 随机种子
+     * @param bound 起点
+     * @param origin 终点（不包含）
+     * */
     public static int randomBound(Random r, int origin,int bound) {
        return r.nextInt(bound - origin + 1) + origin;
     }
 
-
-
-    public static void main(String[] args) {
-        TERenderer ter = new TERenderer();
-        ter.initialize(Width, Height);
-
-        Random r = new Random(80);
-        TETile[][] city = RandomGenerator(r);
-        String s = TETile.toString(city);
-        ter.renderFrame(city);
+    /** 整个地图中生成终点以及生成人物
+     * @param r 随机数
+     * @param world 世界
+     * */
+    public static void GeneralAvatar(TETile[][] world,Random r) {
     }
 }

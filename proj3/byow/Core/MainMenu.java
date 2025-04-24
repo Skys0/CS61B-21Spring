@@ -11,8 +11,8 @@ public class MainMenu {
     private static int Height;
     private static final String title = "CS61B: THE GAME";
     private static final String[] options = {"New Game (N)", "Load Game (L)", "Quit (Q)"};
-    private static final Font titleFont = new Font("Consolas", Font.BOLD, 30);
-    private static final Font littleFont = new Font("Consolas", Font.PLAIN, 20);
+    public static final Font titleFont = new Font("Consolas", Font.BOLD, 30);
+    public static final Font littleFont = new Font("Consolas", Font.PLAIN, 20);
 
     public static void ShowMainMenu(int width, int height) {
         Width = width;

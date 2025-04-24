@@ -1,5 +1,6 @@
 package byow.TileEngine;
 
+import byow.Core.MainMenu;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.awt.Color;
@@ -17,6 +18,7 @@ public class TERenderer {
     private int height;
     private int xOffset;
     private int yOffset;
+    private final Font font = new Font("Monaco", Font.BOLD, TILE_SIZE - 2);
 
     /**
      * Same functionality as the other initialization method. The only difference is that the xOff
@@ -33,7 +35,6 @@ public class TERenderer {
         this.xOffset = xOff;
         this.yOffset = yOff;
         StdDraw.setCanvasSize(width * TILE_SIZE, height * TILE_SIZE);
-        Font font = new Font("Monaco", Font.BOLD, TILE_SIZE - 2);
         StdDraw.setFont(font);      
         StdDraw.setXscale(0, width);
         StdDraw.setYscale(0, height);
@@ -82,8 +83,9 @@ public class TERenderer {
      * value is the width of the screen in tiles, and the max y value is the height of
      * the screen in tiles.
      * @param world the 2D TETile[][] array to render
+     * @param HUD 这个是左上角的HUD
      */
-    public void renderFrame(TETile[][] world) {
+    public void renderFrame(TETile[][] world, String HUD) {
         int numXTiles = world.length;
         int numYTiles = world[0].length;
         StdDraw.clear(new Color(0, 0, 0));
@@ -96,6 +98,12 @@ public class TERenderer {
                 world[x][y].draw(x + xOffset, y + yOffset);
             }
         }
+        if (HUD != null) {
+            StdDraw.setFont(font);
+            StdDraw.setPenColor(Color.white);
+            StdDraw.text(HUD.length() / 2.0, height - 1, HUD);
+        }
+
         StdDraw.show();
     }
 }

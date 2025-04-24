@@ -28,14 +28,29 @@ public class Engine {
             TERenderer ter = new TERenderer();
             ter.initialize(WIDTH, HEIGHT);
             TETile[][] world = RandomGenerator(r);
-            ter.renderFrame(world);
-
+            while (true) {
+                try {
+                    Thread.sleep(20);
+                }
+                catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                String HUD = KeyBoradInput.GetMousePosition(world);
+                String move = KeyBoradInput.InputControlWASD();
+                if (move != null) {
+                    System.out.println(1);
+                    if (move.equals("W") || move.equals("w")) System.out.println("W");
+                    if (move.equals("S") || move.equals("s")) System.out.println("S");
+                    if (move.equals("A") || move.equals("a")) System.out.println("A");
+                    if (move.equals("D") || move.equals("d")) System.out.println("D");
+                }
+                ter.renderFrame(world, HUD);
+            }
         } else if (x == 'L' || x == 'l') {
 
         } else if (x == 'Q' || x == 'q') {
             System.exit(0);
         }
-
     }
 
     /**
