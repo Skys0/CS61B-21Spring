@@ -41,16 +41,18 @@ public class KeyBoradInput {
         if (mousePosX >= world.length || mousePosY >= world[0].length) {
             return null;
         }
-        if (world[mousePosX][mousePosY] == Tileset.NOTHING) {
+        if (world[mousePosX][mousePosY] == Tileset.NOTHING)
             return null;
-        }
-        else if (world[mousePosX][mousePosY] == Tileset.WALL) {
+        else if (world[mousePosX][mousePosY] == Tileset.WALL)
             return "WALL";
-        }
-        else if (world[mousePosX][mousePosY] == Tileset.FLOOR) {
+        else if (world[mousePosX][mousePosY] == Tileset.FLOOR)
             return "FLOOR";
-        }
-        return "UNDEFINED";
+        else if (world[mousePosX][mousePosY] == Tileset.AVATAR)
+            return "AVATAR";
+        else if (world[mousePosX][mousePosY] == Tileset.SAND)
+            return "END Position";
+        else
+            return "UNDEFINED";
     }
 
     /** 处理是否有没有上下左右的移动 */

@@ -86,6 +86,7 @@ public class RandomCityGenerator {
 
         ReverseWall(city);
         GenerateOtherWall(city);
+        GeneralAvatar(city, boxes, r);
         return city;
     }
 
@@ -256,13 +257,37 @@ public class RandomCityGenerator {
      * @param origin 终点（不包含）
      * */
     public static int randomBound(Random r, int origin,int bound) {
-       return r.nextInt(bound - origin + 1) + origin;
+       return r.nextInt(bound - origin) + origin;
     }
 
     /** 整个地图中生成终点以及生成人物
      * @param r 随机数
      * @param world 世界
+     * @param boxes 我们让人物和终点都在房间中
      * */
-    public static void GeneralAvatar(TETile[][] world,Random r) {
+    public static void GeneralAvatar(TETile[][] world,List<Box> boxes, Random r) {
+        int AvatarBox = randomBound(r, 0, boxes.size());
+        int EndBox = randomBound(r, 0, boxes.size());
+        // 要求两个所在的房间不一样
+        while (AvatarBox == EndBox) {
+            AvatarBox = randomBound(r, 0, boxes.size());
+            EndBox = randomBound(r, 0, boxes.size());
+        }
+        System.out.println(AvatarBox + " " + EndBox);
+        GeneralSomeThing(world, boxes.get(AvatarBox), r, Tileset.AVATAR);
+        GeneralSomeThing(world, boxes.get(EndBox), r, Tileset.SAND);
+    }
+
+    /** 在房间中随机生成给定的东西
+     * @param world 世界
+     * @param r 随机数
+     * @param b 给定的盒子
+     * @param o 指定的东西
+     * */
+    public static void GeneralSomeThing(TETile[][] world, Box b, Random r, TETile o) {
+        int tx = randomBound(r, b.getx(), b.getx() + b.getWidth());
+        int ty = randomBound(r, b.gety() - b.getHeight() + 1, b.gety());
+
+        world[tx][ty] = o;
     }
 }

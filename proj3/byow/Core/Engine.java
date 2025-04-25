@@ -28,6 +28,10 @@ public class Engine {
             TERenderer ter = new TERenderer();
             ter.initialize(WIDTH, HEIGHT);
             TETile[][] world = RandomGenerator(r);
+
+            MoveAvatar Avatar = new MoveAvatar(WIDTH, HEIGHT, world);
+
+            // 游戏开始：一次次的循环
             while (true) {
                 try {
                     Thread.sleep(20);
@@ -35,14 +39,21 @@ public class Engine {
                 catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                // 设置刷新率，现在是一秒刷新 50 次
                 String HUD = KeyBoradInput.GetMousePosition(world);
                 String move = KeyBoradInput.InputControlWASD();
                 if (move != null) {
                     System.out.println(1);
-                    if (move.equals("W") || move.equals("w")) System.out.println("W");
-                    if (move.equals("S") || move.equals("s")) System.out.println("S");
-                    if (move.equals("A") || move.equals("a")) System.out.println("A");
-                    if (move.equals("D") || move.equals("d")) System.out.println("D");
+                    if (move.equals("W") || move.equals("w"))   Avatar.Move(world, "W");
+                    if (move.equals("S") || move.equals("s"))   Avatar.Move(world, "S");
+                    if (move.equals("A") || move.equals("a"))   Avatar.Move(world, "A");
+                    if (move.equals("D") || move.equals("d"))   Avatar.Move(world, "D");
+                    if (move.equals(":")) {
+                        char optQ = KeyBoradInput.InputSingleWord();
+                        if (optQ == 'q' || optQ == 'Q') {
+                            System.exit(0);
+                        }
+                    }
                 }
                 ter.renderFrame(world, HUD);
             }
