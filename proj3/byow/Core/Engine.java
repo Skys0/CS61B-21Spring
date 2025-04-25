@@ -2,6 +2,7 @@ package byow.Core;
 
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
+import byow.TileEngine.Tileset;
 import edu.princeton.cs.introcs.StdDraw;
 
 import java.util.Random;
@@ -21,46 +22,51 @@ public class Engine {
     public void interactWithKeyboard() {
         MainMenu.ShowMainMenu(40, 40);
         char x = KeyBoradInput.InputSingleWord();
+        TETile[][] world = new TETile[WIDTH][HEIGHT];
+        TETile[][] showWorld = new TETile[WIDTH][HEIGHT];
+        for (int i = 0;i < WIDTH;i ++)
+            for (int j = 0;j < HEIGHT;j ++)
+                showWorld[i][j] = Tileset.NOTHING;
         if (x == 'N' || x == 'n') {
             long seed = 0;
             seed = KeyBoradInput.InputSeed();
             Random r = new Random(seed);
             TERenderer ter = new TERenderer();
             ter.initialize(WIDTH, HEIGHT);
-            TETile[][] world = RandomGenerator(r);
-
-            MoveAvatar Avatar = new MoveAvatar(WIDTH, HEIGHT, world);
-
-            // 游戏开始：一次次的循环
-            while (true) {
-                try {
-                    Thread.sleep(20);
-                }
-                catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                // 设置刷新率，现在是一秒刷新 50 次
-                String HUD = KeyBoradInput.GetMousePosition(world);
-                String move = KeyBoradInput.InputControlWASD();
-                if (move != null) {
-                    System.out.println(1);
-                    if (move.equals("W") || move.equals("w"))   Avatar.Move(world, "W");
-                    if (move.equals("S") || move.equals("s"))   Avatar.Move(world, "S");
-                    if (move.equals("A") || move.equals("a"))   Avatar.Move(world, "A");
-                    if (move.equals("D") || move.equals("d"))   Avatar.Move(world, "D");
-                    if (move.equals(":")) {
-                        char optQ = KeyBoradInput.InputSingleWord();
-                        if (optQ == 'q' || optQ == 'Q') {
-                            System.exit(0);
-                        }
-                    }
-                }
-                ter.renderFrame(world, HUD);
-            }
+            world = RandomGenerator(r);
         } else if (x == 'L' || x == 'l') {
 
         } else if (x == 'Q' || x == 'q') {
             System.exit(0);
+        }
+        MoveAvatar Avatar = new MoveAvatar(WIDTH, HEIGHT, world);
+
+        // 游戏开始：一次次的循环
+        while (true) {
+            try {
+                Thread.sleep(20);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            // 设置刷新率，现在是一秒刷新 50 次
+            String HUD = KeyBoradInput.GetMousePosition(world);
+            String move = KeyBoradInput.InputControlWASD();
+            if (move != null) {
+                if (move.equals("W") || move.equals("w"))   Avatar.Move(world, "W");
+                if (move.equals("S") || move.equals("s"))   Avatar.Move(world, "S");
+                if (move.equals("A") || move.equals("a"))   Avatar.Move(world, "A");
+                if (move.equals("D") || move.equals("d"))   Avatar.Move(world, "D");
+                if (move.equals("V") || move.equals("v"))   Avatar.changeHidden();
+                if (move.equals(":")) {
+                    char optQ = KeyBoradInput.InputSingleWord();
+                    if (optQ == 'q' || optQ == 'Q') {
+                        Avatar.Save(world);
+                        System.exit(0);
+                    }
+                }
+            }
+            ter.renderFrame(Avatar.GetPrintWorld(world), HUD);
         }
     }
 
@@ -94,7 +100,6 @@ public class Engine {
         // that works for many different input types.
         Long seed = Long.parseLong(input.substring(1, input.length() - 1));
         Random r = new Random(seed);
-        TETile[][] finalWorldFrame = RandomGenerator(r);
-        return finalWorldFrame;
+        return RandomGenerator(r);
     }
 }

@@ -66,7 +66,7 @@ public class RandomCityGenerator {
         edgeBox = AddBoxEdge(city, boxes);
 
         for (List<Point> edges : edgeBox) {
-            int cnt1 = 1;
+            int cnt1 = 2;
             for (int i = 0;i < cnt1;i ++) {
                 int t = r.nextInt(edges.size() - 1);
                 DrawOneCell(city, edges.get(t), Tileset.WALL);
